@@ -315,7 +315,7 @@ ALL_BRANDS = {
     '120':'Seba',
     '121':'APlus'
 }   
-all_brands_ordered = sorted(ALL_BRANDS.items(), key=lambda item: int(item[0])) # order
+all_brands_ordered = sorted(ALL_BRANDS.items(), key=lambda item: item[1]) # order
 BRAND_OPTIONS_AS_LIST = ''
 for number, brand in all_brands_ordered:
     BRAND_OPTIONS_AS_LIST += number + '.- ' + brand + '\n'

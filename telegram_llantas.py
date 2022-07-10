@@ -45,7 +45,7 @@ from utils.regexpessions import ALL_OWNERS_REGEX
 from utils.regexpessions import ALL_STATUS_REGEX
 from utils.regexpessions import ALL_ECONOMICO_REGEX
 
-QUANTITY, STATUS, BRAND, MEASURE, DOTS, OWNER, ECONOMICO, PHOTO = range(8)
+QUANTITY, STATUS, BRAND, MEASURE, DOTS, OWNER, ECONOMICO, COMMENT, PHOTO = range(9)
 
 
 def start(update: Update, context: CallbackContext) -> int:
@@ -123,7 +123,7 @@ def owner(update: Update, context: CallbackContext) -> int:
 def economico(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
-    logger.info("User %s: dots %s", user.first_name, update.message.text)
+    logger.info("User %s: owner %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR ECONOMICO ---")
     update.message.reply_text(
         'Selecciona el economico al que va la llanta.' + 
@@ -131,11 +131,24 @@ def economico(update: Update, context: CallbackContext) -> int:
     )
     return ECONOMICO
 
+def comment(update: Update, context: CallbackContext) -> int:
+    """Stores the info about the user and ends the conversation."""
+    user = update.message.from_user
+    logger.info("User %s: economico %s", user.first_name, update.message.text)
+    logger.info("---- ASK FOR COMMENT ---")
+    update.message.reply_text(
+        'Agrega un comentario a la entrega de la llanta.\n' 
+        'Ejemplo: Entrega maestro talachero \n'+ 
+        CANCEL_TEXT
+    )
+   
+    return COMMENT
+
 
 def photo(update: Update, context: CallbackContext) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
-    logger.info("User %s: owner %s", user.first_name, update.message.text)
+    logger.info("User %s: comment %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR PHOTO ---")
 
     update.message.reply_text(
@@ -172,6 +185,7 @@ def goodbye(update: Update, context: CallbackContext) -> int:
     logger.info("USER %s: LAST_MESSAGE: %s", user.first_name, update.message.text)
 
     update.message.reply_text('Gracias! Llantas guardadas.')
+    logger.info("---- END ---")
     return ConversationHandler.END
 
 def cancel(update: Update, context: CallbackContext) -> int:
@@ -221,7 +235,8 @@ def main() -> None:
             MEASURE: [MessageHandler(Filters.regex(ALL_MEASURES_REGEX), dots)],
             DOTS: [MessageHandler(Filters.regex(DOTS_REGEX), owner)],
             OWNER: [MessageHandler(Filters.regex(ALL_OWNERS_REGEX), economico)],
-            ECONOMICO: [MessageHandler(Filters.regex(ALL_ECONOMICO_REGEX), photo)],
+            ECONOMICO: [MessageHandler(Filters.regex(ALL_ECONOMICO_REGEX), comment)],
+            COMMENT: [MessageHandler(Filters.text & ~Filters.command, photo), CommandHandler('skip', photo)],
             PHOTO: [MessageHandler(Filters.photo, goodbye_with_photo), CommandHandler('skip', goodbye)],
         },
         fallbacks=[CommandHandler('cancelar', cancel)],

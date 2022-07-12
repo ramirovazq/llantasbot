@@ -340,7 +340,7 @@ STATUS_OPTIONS_AS_LIST = ''
 for number, status in all_status_ordered:
     STATUS_OPTIONS_AS_LIST += number + '.- ' + status + '\n'
 
-
+#owners
 ALL_OWNERS = {
     "344":"A CAMBIO",
 	"308":"GÜERO",
@@ -359,6 +359,7 @@ OWNERS_OPTIONS_AS_LIST = ''
 for number, owner in all_owners_ordered:
     OWNERS_OPTIONS_AS_LIST += number + '.- ' + owner + '\n'
 
+#measures
 ALL_MEASURES = {
     "12":"275/70R22.5",
 	"11":"275/80R24.5",
@@ -371,8 +372,6 @@ ALL_MEASURES = {
 	"2":"11R24.5",
 	"1":"11R22.5",
 }
-
-#measures
 all_measures_ordered = sorted(ALL_MEASURES.items(), key=lambda item: int(item[0])) #order
 MEASURES_OPTIONS_AS_LIST = ''
 for number, measure in all_measures_ordered:

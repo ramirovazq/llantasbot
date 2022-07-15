@@ -20,7 +20,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     Updater,
@@ -45,12 +44,19 @@ from utils.regexpessions import ALL_OWNERS_REGEX
 from utils.regexpessions import ALL_STATUS_REGEX
 from utils.regexpessions import ALL_ECONOMICO_REGEX
 
-QUANTITY, STATUS, BRAND, MEASURE, DOTS, OWNER, ECONOMICO, COMMENT, PHOTO = range(9)
+from utils.comfortable import open_new_pickle
+from utils.comfortable import open_and_save_pickle
+from utils.comfortable import read_pickle
 
+QUANTITY, STATUS, BRAND, MEASURE, DOTS, OWNER, ECONOMICO, COMMENT, PHOTO = range(9)
 
 def start(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about their gender."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_new_pickle(username, "step 0 in pickle")
+
     logger.info("---- START ---")
     logger.info("User: %s", user.first_name)
     logger.info("---- ASK FOR QUANTITY ---")
@@ -63,6 +69,9 @@ def start(update: Update, context: CallbackContext) -> int:
 def status(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 2", "quantity", update.message.text)
     logger.info("User %s: quantity %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR STATUS ---")
     update.message.reply_text(
@@ -74,6 +83,9 @@ def status(update: Update, context: CallbackContext) -> int:
 def brand(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 3", "status", update.message.text)
     logger.info("User %s: status %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR BRAND ---")
     update.message.reply_text(
@@ -85,6 +97,9 @@ def brand(update: Update, context: CallbackContext) -> int:
 def measure(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 4", "brand", update.message.text)
     logger.info("User %s: brand %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR MEASURE ---")
     update.message.reply_text(
@@ -96,6 +111,9 @@ def measure(update: Update, context: CallbackContext) -> int:
 def dots(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 5", "measure", update.message.text)
     logger.info("User %s: measure %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR DOT OR DOTS ---")
     update.message.reply_text(
@@ -112,6 +130,9 @@ def dots(update: Update, context: CallbackContext) -> int:
 def owner(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 6", "dots", update.message.text)
     logger.info("User %s: dots %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR OWNER ---")
     update.message.reply_text(
@@ -123,6 +144,9 @@ def owner(update: Update, context: CallbackContext) -> int:
 def economico(update: Update, context: CallbackContext) -> int:
     """Starts the conversation and asks the user about brand."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 7", "owner", update.message.text)
     logger.info("User %s: owner %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR ECONOMICO ---")
     update.message.reply_text(
@@ -132,8 +156,10 @@ def economico(update: Update, context: CallbackContext) -> int:
     return ECONOMICO
 
 def comment(update: Update, context: CallbackContext) -> int:
-    """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 8", "economico", update.message.text)
     logger.info("User %s: economico %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR COMMENT ---")
     update.message.reply_text(
@@ -144,10 +170,12 @@ def comment(update: Update, context: CallbackContext) -> int:
    
     return COMMENT
 
-
 def photo(update: Update, context: CallbackContext) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 9", "comment", update.message.text)
     logger.info("User %s: comment %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR PHOTO ---")
 
@@ -161,6 +189,9 @@ def photo(update: Update, context: CallbackContext) -> int:
 def skip_photo(update: Update, context: CallbackContext) -> int:
     """Skips the photo and asks for a location."""
     user = update.message.from_user
+    username = user.first_name
+
+    open_and_save_pickle(username, "step 10", "photo", "")
     logger.info("User %s: owner %s", user.first_name, update.message.text)
     logger.info("---- ASK FOR PHOTO ---")
     update.message.reply_text('No se envió foto. Llantas guardadas.¡Gracias!')
@@ -168,22 +199,31 @@ def skip_photo(update: Update, context: CallbackContext) -> int:
     return PHOTO
 
 def goodbye_with_photo(update: Update, context: CallbackContext) -> int:
-    """Stores the info about the user and ends the conversation."""
+    
     user = update.message.from_user
+    username = user.first_name
     logger.info("USER %s: LAST_MESSAGE: %s", user.first_name, update.message.text)
 
     photo_file = update.message.photo[-1].get_file()
+    logger.info("photo_file --->")
+    logger.info(photo_file)
+    open_and_save_pickle(username, "step 10", "photo", "photo_file.jpg")
     photo_file.download('user_photo.jpg')
-    logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
+    logger.info("Photo of %s: %s", user.first_name, photo_file)
 
+    dict_result = read_pickle(username, "final_step")
+    logger.info(dict_result)
     update.message.reply_text('Llantas guardadas.!Gracias!')
     return ConversationHandler.END
 
 def goodbye(update: Update, context: CallbackContext) -> int:
-    """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
+    username = user.first_name
+
     logger.info("USER %s: LAST_MESSAGE: %s", user.first_name, update.message.text)
 
+    dict_result = read_pickle(username, "final_step")
+    logger.info(dict_result)
     update.message.reply_text('Gracias! Llantas guardadas.')
     logger.info("---- END ---")
     return ConversationHandler.END

@@ -1,0 +1,7 @@
+.env
+venv
+*.pyc
+*.jpg
+*.png
+*.pk
+pickle_files/*.pk

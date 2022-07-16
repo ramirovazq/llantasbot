@@ -258,9 +258,9 @@ def unknown(update, context):
 
 def main() -> None:
     """Run the bot."""
-    TOKEN_FATHER = os.getenv("TOKEN_FATHER")
+    TOKEN_LLANTAS = os.getenv("TOKEN_LLANTAS")
     # Create the Updater and pass it your bot's token.
-    updater = Updater(TOKEN_FATHER)
+    updater = Updater(TOKEN_LLANTAS)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

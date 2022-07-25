@@ -61,7 +61,7 @@ def start(update: Update, context: CallbackContext) -> int:
     logger.info("User: %s", user.first_name)
     logger.info("---- ASK FOR QUANTITY ---")
     update.message.reply_text(
-        'Hola, soy el Bot del almacén de entrega de llantas.\n' +
+        'Hola, soy el 🤖 del almacén de entrega de llantas.\n' +
         CANCEL_TEXT + '¿Cuantas llantas del mismo tipo son?'
     )
     return QUANTITY
@@ -241,26 +241,26 @@ def cancel(update: Update, context: CallbackContext) -> int:
 def help(update, context):
     logger.info("Command: Help")
 
-    ayuda_text = "opciones: "
+    ayuda_text = "Lista de opciones: \n"
     commands_list = [
-        "/entrega", 
-        "/cancelar",
-        "/help",
+        "/entrega \n", 
+        "/help  \n\n",
     ]
-    ayuda_text = ayuda_text + " ".join(commands_list)
+    end_ayuda_text = "Selecciona una opción."
+    ayuda_text = ayuda_text + " ".join(commands_list) + end_ayuda_text
 
-    update.message.reply_text("Ayuda")
+    # update.message.reply_text("Ayuda")
     context.bot.send_message(chat_id=update.effective_chat.id, text=ayuda_text)
 
 def unknown(update, context):
     logger.info("Unknown command handler")
-    context.bot.send_message(chat_id=update.effective_chat.id, text="No te entiendo lo que solicitas. /help")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="No entiendo lo que solicitas. /help")
 
 def main() -> None:
     """Run the bot."""
     TOKEN_LLANTAS = os.getenv("TOKEN_LLANTAS")
     # Create the Updater and pass it your bot's token.
-    updater = Updater(TOKEN_LLANTAS)
+    updater = Updater(TOKEN_LLANTAS, use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
@@ -285,8 +285,7 @@ def main() -> None:
     dispatcher.add_handler(conv_handler)
 
     # add help command
-    help_command = MessageHandler(Filters.command, help)
-    dispatcher.add_handler(help_command)
+    dispatcher.add_handler(CommandHandler('help', help))
 
     # add unknown handler
     unknown_handler = MessageHandler(Filters.command, unknown)
